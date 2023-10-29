@@ -51,6 +51,7 @@ Then running the command again
 5. **Run the Flask App**:
 ```
 export FLASK_APP=project
+export FLASK_DEBUG=1
 flask run
 
 ```
