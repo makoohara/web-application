@@ -46,15 +46,16 @@ function SubTask({ subTask, onDelete }) {
         }
     };
 
+ 
     return (
-        <div>
-            <h3>{subTask.title}</h3>
+        <div style={{ border: '1px solid blue', padding: '10px', margin: '10px' }}>
+            <h2>{subTask.title}</h2>
             <button onClick={handleExpandClick}>
                 {isExpanded ? "Collapse" : "Expand"}
             </button>
             <button onClick={() => onDelete(subTask)}>Delete SubTask</button>
             {isExpanded && (
-                <>
+                <div style={{ marginLeft: '20px' }}>
                     {subSubTasks.map(subSubTask => (
                         <SubSubTask 
                             key={subSubTask.id} 
@@ -69,7 +70,7 @@ function SubTask({ subTask, onDelete }) {
                         placeholder="New SubSubTask Title"
                     />
                     <button onClick={handleAddSubSubTask}>Add SubSubTask</button>
-                </>
+                </div>
             )}
         </div>
     );

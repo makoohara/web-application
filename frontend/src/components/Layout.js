@@ -45,7 +45,6 @@ function Layout({ children }) {
                                 <div id="navbarMenuHeroA" className="navbar-menu">
                                     <div className="navbar-start">
                                         <a href="/tasks" className="navbar-item">Tasks</a>
-                                        <a href="/profile" className="navbar-item">Profile</a>
                                     </div>
                                     <div className="navbar-end">
                                         <a href="/logout" className="navbar-item">Logout</a>

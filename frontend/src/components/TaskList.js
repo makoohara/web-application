@@ -9,7 +9,28 @@ function TaskList() {
 
     const navigate = useNavigate();
     const [refresh, setRefresh] = useState(false); // Initialize with true to fetch data on mount
+    const [username, setUsername] = useState('');
 
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+
+    if (!token) {
+        console.error("No token found");
+        return;
+    }
+
+    axios.get('/get_current_user', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+        .then(response => {
+            setUsername(response.data.username);
+        })
+        .catch(error => {
+            console.error("Error fetching user details:", error);
+        });
+    }, []);
 
     // Function to fetch tasks from server
     const fetchTasks = () => {
@@ -72,22 +93,28 @@ const handleTaskDelete = (task) => {
 
 
     return (
-        <div className="container">
-            {tasks.map(task => (
-                <Task 
-                    key={task.id} 
-                    task={task} 
-                    onDelete={() => handleTaskDelete(task)}
-                    onSubTaskDelete={fetchTasks}  // If you want to refresh after a subtask is deleted as well
+        <div>
+            <div>
+                <h2>Hello! {username}</h2>
+            </div>
+            
+            <div className="container">
+                {tasks.map(task => (
+                    <Task 
+                        key={task.id} 
+                        task={task} 
+                        onDelete={() => handleTaskDelete(task)}
+                        onSubTaskDelete={fetchTasks}  // If you want to refresh after a subtask is deleted as well
+                    />
+                ))}
+                <input 
+                    type="text" 
+                    value={newTaskTitle} 
+                    onChange={e => setNewTaskTitle(e.target.value)} 
+                    placeholder="New Task Title"
                 />
-            ))}
-            <input 
-                type="text" 
-                value={newTaskTitle} 
-                onChange={e => setNewTaskTitle(e.target.value)} 
-                placeholder="New Task Title"
-            />
-            <button onClick={handleAddTask}>Add Task</button>
+                <button onClick={handleAddTask}>Add Task</button>
+            </div>
         </div>
     );
 }

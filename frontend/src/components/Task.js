@@ -47,14 +47,14 @@ function Task({ task, onDelete, onSubTaskDelete }) {
     };
 
     return (
-        <div>
-            <h2>{task.title}</h2>
+        <div style={{ border: '1px solid black', padding: '10px', margin: '10px' }}>
+            <h1>{task.title}</h1>
             <button onClick={handleExpandClick}>
                 {isExpanded ? "Collapse" : "Expand"}
             </button>
             <button onClick={() => onDelete(task)}>Delete Task</button>
             {isExpanded && (
-                <>
+                <div style={{ marginLeft: '20px' }}>
                     {subTasks.map(subTask => (
                         <SubTask 
                             key={subTask.id} 
@@ -69,10 +69,11 @@ function Task({ task, onDelete, onSubTaskDelete }) {
                         placeholder="New SubTask Title"
                     />
                     <button onClick={handleAddSubTask}>Add SubTask</button>
-                </>
+                </div>
             )}
         </div>
     );
 }
+
 
 export default Task;
