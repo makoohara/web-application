@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, login_required, logout_user
 from .models import User
 from . import db
 import jwt as pyjwt
@@ -57,7 +56,6 @@ def signup_post():
     return jsonify({"message": "User registered successfully."})
 
 @auth.route('/logout', methods=['POST'])
-@login_required
 def logout():
     logout_user()
     return jsonify({"message": "Logged out successfully."})

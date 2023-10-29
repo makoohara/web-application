@@ -12,16 +12,31 @@ function SignUp({ onSignUpSuccess }) {
         console.log("handleSignUp function executed");
         axios.post('/register', { username, password })
             .then(response => {
-                onSignUpSuccess(); // If you have some logic to execute on successful signup, this function will execute it.
-                alert('Signup successful! Please login with your new account.');
-                navigate('/login'); // Switch the user to the login page.
+                // onSignUpSuccess();
+                alert(response.data.message); // Display the message property
+                navigate('/login');
             })
             .catch(error => {
+                console.error("Error during signup:", error);
                 setErrorMessage('Error signing up. Please try again.');
             });
-            console.log("Username:", username);
-            console.log("Password:", password);
     };
+    
+
+    // const handleSignUp = () => {
+    //     console.log("handleSignUp function executed");
+    //     axios.post('/register', { username, password })
+    //         .then(response => {
+    //             onSignUpSuccess(); // If you have some logic to execute on successful signup, this function will execute it.
+    //             alert(response.data);
+    //             navigate('/login'); // Switch the user to the login page.
+    //         })
+    //         .catch(error => {
+    //             setErrorMessage('Error signing up. Please try again.');
+    //         });
+    //         console.log("Username:", username);
+    //         console.log("Password:", password);
+    // };
 
     return (
         <div>

@@ -4,7 +4,6 @@ import TaskList from './components/TaskList';
 import Login from './components/Login';
 import SignUp from './components/Signup';
 import Layout from './components/Layout';
-import Profile from './components/Profile';  // Import Profile here if you want to use it
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,7 +24,6 @@ function App() {
                     <Route path="/login" element={isLoggedIn ? <Navigate to="/tasks" /> : <Login onLoginSuccess={handleLoginSuccess} />} />
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/tasks" element={isLoggedIn ? <TaskList /> : <Navigate to="/login" />} />
-                    <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
                     {/* Default redirection to login or tasks based on authentication status */}
                     <Route path="/" element={isLoggedIn ? <Navigate to="/tasks" /> : <Navigate to="/login" />} />
                 </Routes>
