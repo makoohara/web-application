@@ -53,7 +53,6 @@ Then running the command again
 export FLASK_APP=project
 export FLASK_DEBUG=1
 flask run
-
 ```
 
 ### Frontend (React)
@@ -62,19 +61,17 @@ flask run
 
 ```
 cd frontend
-
 ```
 2. **Install the Required npm Packages**:
 ```
 npm install
-
+npm install axios
 ```
 
 3. **Run the React App**:
 
 ```
 npm start
-
 ```
 
 The React app will now run on `http://localhost:3000` and will proxy backend requests to Flask which runs on `http://localhost:5000`.
