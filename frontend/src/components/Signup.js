@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from '../AxiosConfig.js';
+import { useNavigate } from 'react-router-dom';  // <-- Import useNavigate
 
-function SignUp({ onSignUpSuccess, switchToLogin }) {
+function SignUp({ onSignUpSuccess }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();  // <-- Use the hook
 
     const handleSignUp = () => {
         console.log("handleSignUp function executed");
@@ -12,7 +14,7 @@ function SignUp({ onSignUpSuccess, switchToLogin }) {
             .then(response => {
                 onSignUpSuccess(); // If you have some logic to execute on successful signup, this function will execute it.
                 alert('Signup successful! Please login with your new account.');
-                switchToLogin(); // Switch the user to the login page.
+                navigate('/login'); // Switch the user to the login page.
             })
             .catch(error => {
                 setErrorMessage('Error signing up. Please try again.');
@@ -34,7 +36,7 @@ function SignUp({ onSignUpSuccess, switchToLogin }) {
             </div>
             {errorMessage && <p>{errorMessage}</p>}
             <button onClick={handleSignUp}>Sign Up</button>
-            <p>Already have an account? <button onClick={switchToLogin}>Log In</button></p>
+            <p>Already have an account? <button onClick={() => navigate('/login')}>Log In</button></p>  {/* <-- Navigate to Login */}
         </div>
     );
 }

@@ -192,7 +192,7 @@ def get_subtask(subtask_id):
     subtask = SubTask.query.filter_by(id=subtask_id).first()
     print(subtask)
     print(subtask.to_dict())
-    return jsonify(task.to_dict())
+    return jsonify(subtask.to_dict())
 
 @main.route('/subsubtasks/<int:subtask_id>', methods=['GET'])
 @token_required

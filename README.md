@@ -15,7 +15,7 @@ A dynamic task management web application built with Flask and React.
 
 1. **Clone the Repository**:
 ```
-git clone [your-repository-link]
+git clone https://github.com/makoohara/web-application
 cd backend
 
 ```
@@ -39,7 +39,7 @@ python3 -m venv venv
 4. **Install the Required Packages**:
 
 ```
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 
 ```
 If there is any error during this step, try 
@@ -50,7 +50,7 @@ Then running the command again
 
 5. **Run the Flask App**:
 ```
-export FLASK_APP=backend/project
+export FLASK_APP=project
 export FLASK_DEBUG=1
 flask run
 
@@ -58,7 +58,7 @@ flask run
 
 ### Frontend (React)
 
-1. **Navigate to the React App Directory**:
+1. **Open a separate terminal and Navigate to the React App Directory**:
 
 ```
 cd frontend

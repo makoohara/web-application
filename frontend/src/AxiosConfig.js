@@ -11,7 +11,7 @@ const setAuthorizationHeader = () => {
 }
 
 // Set the default base URL
-axios.defaults.baseURL = 'http://localhost:5000';
+//axios.defaults.baseURL = 'http://localhost:5000';
 
 setAuthorizationHeader();
 

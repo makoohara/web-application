@@ -8,6 +8,8 @@ function TaskList() {
     const [newTaskTitle, setNewTaskTitle] = useState('');
 
     const navigate = useNavigate();
+    const [refresh, setRefresh] = useState(false); // Initialize with true to fetch data on mount
+
 
     // Function to fetch tasks from server
     const fetchTasks = () => {
@@ -24,6 +26,8 @@ function TaskList() {
             });
     };
 
+
+    
     useEffect(() => {
         const token = localStorage.getItem('token');
         
@@ -35,6 +39,13 @@ function TaskList() {
         fetchTasks();
     }, [navigate]);
 
+    useEffect(() => {
+        if (refresh) {
+            fetchTasks();
+            setRefresh(false); // Reset refresh state after fetching
+        }
+    }, [refresh]);
+
     const handleAddTask = () => {
         axios.post('/tasks', { title: newTaskTitle })
             .then(response => {
@@ -44,11 +55,17 @@ function TaskList() {
             .catch(error => {
                 console.error("Error adding task:", error);
             });
+        fetchTasks();
     };
 
-    const handleTaskDelete = () => {
-        // Refresh the tasks after a task is deleted
-        fetchTasks();
+    const handleTaskDelete = (task) => {
+        try {
+            axios.delete(`/tasks/${task.id}`);
+        } catch (error) {
+            console.error(`Error deleting task:`, error);
+        }
+        setRefresh(true); 
+        
     };
 
     return (
@@ -57,7 +74,7 @@ function TaskList() {
                 <Task 
                     key={task.id} 
                     task={task} 
-                    onDelete={handleTaskDelete} 
+                    onDelete={() => handleTaskDelete(task)}
                     onSubTaskDelete={fetchTasks}  // If you want to refresh after a subtask is deleted as well
                 />
             ))}
