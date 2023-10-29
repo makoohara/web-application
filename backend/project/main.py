@@ -208,7 +208,34 @@ def create_subsubtask(subtask_id):
     new_subsubtask = SubSubTask(title=data['title'], subtask_id=subtask_id)
     db.session.add(new_subsubtask)
     db.session.commit()
-    return jsonify(new_sub)
+    return jsonify(new_subsubtask.to_dict()), 201
+                   
+def login():
+    print('log in page loaded')
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required!'}), 400
+    
+    user = User.query.filter_by(username=username).first()
+    
+    if not user:
+        return jsonify({'message': 'User not found!'}), 404
+
+    if check_password_hash(user.password, password):
+        # User authenticated. Let's generate the token.
+        token_payload = {
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(hours=24)  # Token expiration set to 24 hours. Adjust as needed.
+        }
+        print(token_payload)
+        token = pyjwt.encode(token_payload, SECRET_KEY, algorithm="HS256")
+        print("Generated token:", token)
+        return jsonify({'token': token}), 200
+    else:
+        return jsonify({'message': 'Incorrect password!'}), 401
 
 
 @main.route('/subsubtasks/<int:subsubtask_id>', methods=['DELETE'])
