@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom'; // <-- Import useNavigate
 import TaskList from './components/TaskList';
 import Login from './components/Login';
 import SignUp from './components/Signup';
@@ -7,7 +7,6 @@ import Layout from './components/Layout';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-
     const handleLoginSuccess = () => {
         setIsLoggedIn(true);
     };
@@ -15,7 +14,9 @@ function App() {
     const handleLogout = () => {
         localStorage.removeItem('token');
         setIsLoggedIn(false);
+        window.location.href = '/login'; // Redirect to login page after logout
     };
+    
 
     return (
         <Router>
