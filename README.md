@@ -16,7 +16,7 @@ A dynamic task management web application built with Flask and React.
 1. **Clone the Repository**:
 ```
 git clone https://github.com/makoohara/web-application
-cd backend
+cd web-application/backend
 
 ```
 
