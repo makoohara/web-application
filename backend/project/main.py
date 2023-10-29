@@ -13,25 +13,6 @@ main = Blueprint('main', __name__)
 # Define the secret key for JWT encoding/decoding
 SECRET_KEY = '5624a198809cd986e35e2b880c97d58d'
 
-# Route to check if a user is authenticated based on the provided token
-@main.route('/is_authenticated', methods=['GET'])
-def is_authenticated():
-    token = None
-    # Check if the Authorization header is present in the request
-    if 'Authorization' in request.headers:
-        token = request.headers['Authorization'].replace('Bearer ', '')
-    
-    # If token exists, try to decode it
-    if token:
-        try:
-            # Attempt to decode the token
-            pyjwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            return jsonify({'is_authenticated': True}), 200
-        except:
-            pass
-    
-    return jsonify({'is_authenticated': False}), 200
-
 # Decorator function to ensure the route requires a valid token
 def token_required(f):
     @wraps(f)
@@ -54,6 +35,55 @@ def token_required(f):
 
         return f(*args, **kwargs)
     return decorated
+
+@main.route('/login', methods=['POST'])
+def login():
+    print('log in page loaded')
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required!'}), 400
+    
+    user = User.query.filter_by(username=username).first()
+    
+    if not user:
+        return jsonify({'message': 'User not found!'}), 404
+
+    if check_password_hash(user.password, password):
+        # User authenticated. Let's generate the token.
+        token_payload = {
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(hours=24)  # Token expiration set to 24 hours. Adjust as needed.
+        }
+        print(token_payload)
+        token = pyjwt.encode(token_payload, SECRET_KEY, algorithm="HS256")
+        print("Generated token:", token)
+        return jsonify({'token': token}), 200
+    else:
+        return jsonify({'message': 'Incorrect password!'}), 401
+
+# Route to check if a user is authenticated based on the provided token
+@main.route('/is_authenticated', methods=['GET'])
+def is_authenticated():
+    token = None
+    # Check if the Authorization header is present in the request
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].replace('Bearer ', '')
+    
+    # If token exists, try to decode it
+    if token:
+        try:
+            # Attempt to decode the token
+            pyjwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            return jsonify({'is_authenticated': True}), 200
+        except:
+            pass
+    
+    return jsonify({'is_authenticated': False}), 200
+
+
 
 # Route to get the current authenticated user's username
 @main.route('/get_current_user', methods=['GET'])
