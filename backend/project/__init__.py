@@ -1,42 +1,35 @@
+# Import necessary libraries and modules
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 import secrets
 from flask_cors import CORS
 
-
-# init SQLAlchemy so we can use it later in our models
+# Initialize SQLAlchemy to be used later in our models
 db = SQLAlchemy()
 
-
 def create_app():
+    # Create a Flask application instance
     app = Flask(__name__)
+    
+    # Enable CORS for the app
     CORS(app)
 
+    # Generate a secret key for the app
     app.config['SECRET_KEY'] = secrets.token_hex(16)
+    
+    # Set the database URI for SQLAlchemy
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
+    # Initialize the database with the app
     db.init_app(app)
-
-    # blueprint for auth routes in our app
-    from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint)
-
-    # blueprint for non-auth parts of app
+    
+    # Register the main blueprint to the app
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
-    login_manager.init_app(app)
-    
-    @login_manager.user_loader
-    def load_user(user_id):
-        # since the user_id is just the primary key of our user table, use it in the query for the user
-        from .models import User 
-        return User.query.get(int(user_id))
-
+    # Create all database tables within the app context
     with app.app_context():
             db.create_all()
 
+    # Return the app instance
     return app
