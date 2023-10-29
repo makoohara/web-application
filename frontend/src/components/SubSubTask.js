@@ -1,20 +1,26 @@
-import React from 'react';
-import useTaskActions from './useTaskActions';
+import React, { useState, useEffect } from 'react';
+import axios from '../AxiosConfig.js';
 
-function SubSubTask({ subSubTask, onDelete }) {
-    const { handleDelete } = useTaskActions('subsubtasks', subSubTask.id, '', 'subtasks');  // Using 'subtasks' as the parentEndpoint since subsubtasks belong to subtasks.
+function SubSubTask({ subTaskId }) {
+    const [subSubTasks, setSubSubTasks] = useState([]);
 
-    const DeletesubsubTask = () => {
-        handleDelete(subSubTask.id, 'subtasks'); // Specifying 'subtasks' as the parentEndpoint for the deletion logic.
-        if (onDelete) {
-            onDelete(subSubTask.id);
-        }
-    };
+    useEffect(() => {
+        axios.get(`/subtasks/${subTaskId}/subsubtasks`)
+            .then(response => {
+                setSubSubTasks(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching sub-subtasks:", error);
+            });
+    }, [subTaskId]);
 
     return (
-        <div className="subsubtask">
-            <h3>{subSubTask.title}</h3>
-            <button onClick={DeletesubsubTask}>Delete SubSubTask</button>
+        <div>
+            {subSubTasks.map(subSubTask => (
+                <div key={subSubTask.id}>
+                    <h4>{subSubTask.title}</h4>
+                </div>
+            ))}
         </div>
     );
 }

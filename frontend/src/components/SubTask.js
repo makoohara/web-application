@@ -1,55 +1,52 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from '../AxiosConfig.js';
 import SubSubTask from './SubSubTask';
-import useTaskActions from './useTaskActions';
-import { useState, useEffect } from 'react';
 
+function SubTask({ taskId, onSubSubTaskDelete }) {
+    const [subTasks, setSubTasks] = useState([]);
+    const [newSubSubTaskTitle, setNewSubSubTaskTitle] = useState('');
 
-function SubTask({subTask, onDelete }) {
-    const { items: subSubTasks, handleDelete, handleAdd, fetchData } = useTaskActions('subtasks', subTask.id, "subsubtasks", 'tasks');
-    const [newSubSubTaskTitle, setNewSubSubTaskTitle] = React.useState(''); // <-- Add this state
-    const [refresh, setRefresh] = useState(true); // Add this line
+    // ... (rest of the imports and code)
 
-    const DeleteSubTask = () => {
-        handleDelete(subTask.id);
-        if (onDelete) {
-            onDelete(subTask.id);
-            console.log('subtask on delete!')
-        }
-    };    
-    
-
-    const handleSubSubTaskDeleted = () => {
-        setRefresh(true); // Toggle the refresh state to trigger a re-fetch
-    };
-    
     useEffect(() => {
-        if (refresh) {
-            fetchData();
-            setRefresh(false); // Reset refresh state after fetching
-        }
-    }, [refresh]);
+        axios.get(`/tasks/${taskId}/subtasks`)
+            .then(response => {
+                setSubTasks(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching subtasks:", error);
+            });
+    }, [taskId, onSubSubTaskDelete]);  // Add onSubSubTaskDelete as a dependency
 
+    // ... (rest of the code)
+
+
+    const handleAddSubSubTask = (subTaskId) => {
+        axios.post(`/subtasks/${subTaskId}/subsubtasks`, { title: newSubSubTaskTitle })
+            .then(response => {
+                onSubSubTaskDelete();  // Refresh the parent subtask list
+                setNewSubSubTaskTitle('');
+            })
+            .catch(error => {
+                console.error("Error adding sub-subtask:", error);
+            });
+    };
 
     return (
-        <div className="subtask">
-            <h3>{subTask.title}</h3>
-            <button onClick={DeleteSubTask}>Delete SubTask</button>
-            {subSubTasks && (
-                <>
-                    {subSubTasks.map(subSubTask => (
-                        <SubSubTask key={subSubTask.id} subSubTask={subSubTask} onDelete={() => handleSubSubTaskDeleted(subSubTask)} />
-                    ))}
+        <div>
+            {subTasks.map(subTask => (
+                <div key={subTask.id}>
+                    <h3>{subTask.title}</h3>
+                    <SubSubTask subTaskId={subTask.id} />
                     <input 
                         type="text" 
+                        value={newSubSubTaskTitle} 
+                        onChange={e => setNewSubSubTaskTitle(e.target.value)} 
                         placeholder="New SubSubTask Title"
-                        value={newSubSubTaskTitle} // <-- Use the state value here
-                        onChange={e => setNewSubSubTaskTitle(e.target.value)}  // <-- Set the state here 
                     />
-                    <button onClick={() => handleAdd(newSubSubTaskTitle)}>
-                        Add SubSubTask
-                    </button>
-                </>
-            )}
+                    <button onClick={() => handleAddSubSubTask(subTask.id)}>Add SubSubTask</button>
+                </div>
+            ))}
         </div>
     );
 }

@@ -1,67 +1,43 @@
-import { useState, useEffect } from 'react';
-import SubTask from './SubTask';
-import useTaskActions from './useTaskActions';
+import React, { useState } from 'react';
 import axios from '../AxiosConfig.js';
+import SubTask from './SubTask';
 
-
-function Task({ task, onDelete }) {
+function Task({ task, onDelete, onSubTaskDelete }) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [newSubTaskTitle, setNewSubTaskTitle] = useState('');
-    const [refresh, setRefresh] = useState(true); // Add this line
-    const { subTask, handleDelete, handleAdd, fetchData } = useTaskActions('tasks', task.id, "subtasks", '');
-    const [subTasksChanged, setSubTasksChanged] = useState(false);
-    const [items, setItems] = useState([]);
-
-    const handleAddSubTask = (title) => {
-        handleAdd(title);
-        setNewSubTaskTitle('');
-    };
-    
-
-    const handleSubTaskDeleted = () => {
-        setRefresh(true); // Toggle the refresh state to trigger a re-fetch
-    };
 
     const handleExpandClick = () => {
         setIsExpanded(!isExpanded);
     };
 
-    const handleDeleteTask = () => {
-        if (onDelete) {
-            onDelete(task.id);
-            console.log('task on delete!')
-        }
-    };    
-    
-    useEffect(() => {
-        if (refresh) {
-            fetchData();
-            setRefresh(false); // Reset refresh state after fetching
-        }
-    }, [refresh]);
+    const handleAddSubTask = () => {
+        axios.post(`/tasks/${task.id}/subtasks`, { title: newSubTaskTitle })
+            .then(() => {
+                onSubTaskDelete();  // Refresh the parent task list
+                setNewSubTaskTitle('');
+            })
+            .catch(error => {
+                console.error("Error adding subtask:", error);
+            });
+    };
 
     return (
         <div>
-            <h2 className="title">{task.title}</h2>
+            <h2>{task.title}</h2>
             <button onClick={handleExpandClick}>
                 {isExpanded ? "Collapse" : "Expand"}
             </button>
-            <button onClick={handleDeleteTask}>Delete Task</button>
+            <button onClick={onDelete}>Delete Task</button>
             {isExpanded && (
                 <>
-                    {subTask && subTask.map(subTask => (
-                        <SubTask key={subTask.id} subTask={subTask} onDelete={handleSubTaskDeleted} />
-                    ))}
-
+                    <SubTask taskId={task.id} onSubSubTaskDelete={onSubTaskDelete} />
                     <input 
                         type="text" 
                         value={newSubTaskTitle} 
                         onChange={e => setNewSubTaskTitle(e.target.value)} 
                         placeholder="New SubTask Title"
                     />
-                    {/* {<button onClick={() => handleAddSubTask(newSubTaskTitle)}>Add SubTask</button> */
-
-                    <button onClick={() => handleAddSubTask(newSubTaskTitle)}>Add SubTask</button> }
+                    <button onClick={handleAddSubTask}>Add SubTask</button>
                 </>
             )}
         </div>

@@ -46,27 +46,30 @@ function TaskList() {
         }
     }, [refresh]);
 
-    const handleAddTask = () => {
-        axios.post('/tasks', { title: newTaskTitle })
-            .then(response => {
-                setTasks([...tasks, response.data]);
-                setNewTaskTitle('');
-            })
-            .catch(error => {
-                console.error("Error adding task:", error);
-            });
-        fetchTasks();
-    };
+// ... (rest of the imports and code)
 
-    const handleTaskDelete = (task) => {
-        try {
-            axios.delete(`/tasks/${task.id}`);
-        } catch (error) {
+const handleAddTask = () => {
+    axios.post('/tasks', { title: newTaskTitle })
+        .then(response => {
+            setTasks([...tasks, response.data]);
+            setNewTaskTitle('');
+            fetchTasks();  // Fetch tasks after adding a new task
+        })
+        .catch(error => {
+            console.error("Error adding task:", error);
+        });
+};
+
+const handleTaskDelete = (task) => {
+    axios.delete(`/tasks/${task.id}`)
+        .then(() => {
+            fetchTasks();  // Fetch tasks after successful deletion
+        })
+        .catch(error => {
             console.error(`Error deleting task:`, error);
-        }
-        setRefresh(true); 
-        
-    };
+        });
+};
+
 
     return (
         <div className="container">
