@@ -9,19 +9,18 @@ function Task({ task, onDelete }) {
     const [newSubTaskTitle, setNewSubTaskTitle] = useState('');
     const [refresh, setRefresh] = useState(true); // Add this line
     const { subTask, handleDelete, handleAdd, fetchData } = useTaskActions('tasks', task.id, "subtasks", '');
+    const [subTasksChanged, setSubTasksChanged] = useState(false);
     const [items, setItems] = useState([]);
 
+    const handleAddSubTask = (title) => {
+        handleAdd(title);
+        setNewSubTaskTitle('');
+    };
+    
 
     const handleSubTaskDeleted = () => {
         setRefresh(true); // Toggle the refresh state to trigger a re-fetch
     };
-    
-    // useEffect(() => {
-    //     if (refresh) {
-    //         fetchData();
-    //         setRefresh(false); // Reset refresh state after fetching
-    //     }
-    // }, [refresh]);
 
     const handleExpandClick = () => {
         setIsExpanded(!isExpanded);
@@ -60,7 +59,9 @@ function Task({ task, onDelete }) {
                         onChange={e => setNewSubTaskTitle(e.target.value)} 
                         placeholder="New SubTask Title"
                     />
-                    <button onClick={() => handleAdd(newSubTaskTitle)}>Add SubTask</button>
+                    {/* {<button onClick={() => handleAddSubTask(newSubTaskTitle)}>Add SubTask</button> */
+
+                    <button onClick={() => handleAddSubTask(newSubTaskTitle)}>Add SubTask</button> }
                 </>
             )}
         </div>
