@@ -2,51 +2,75 @@ import React, { useState, useEffect } from 'react';
 import axios from '../AxiosConfig.js';
 import SubSubTask from './SubSubTask';
 
-function SubTask({ taskId, onSubSubTaskDelete }) {
-    const [subTasks, setSubTasks] = useState([]);
+function SubTask({ subTask, onDelete }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [subSubTasks, setSubSubTasks] = useState([]);
     const [newSubSubTaskTitle, setNewSubSubTaskTitle] = useState('');
 
-    // ... (rest of the imports and code)
-
-    useEffect(() => {
-        axios.get(`/tasks/${taskId}/subtasks`)
+    const fetchSubSubTasks = () => {
+        axios.get(`/subtasks/${subTask.id}/subsubtasks`)
             .then(response => {
-                setSubTasks(response.data);
+                setSubSubTasks(response.data);
             })
             .catch(error => {
-                console.error("Error fetching subtasks:", error);
+                console.error("Error fetching subsubtasks:", error);
             });
-    }, [taskId, onSubSubTaskDelete]);  // Add onSubSubTaskDelete as a dependency
+    };
 
-    // ... (rest of the code)
-
-
-    const handleAddSubSubTask = (subTaskId) => {
-        axios.post(`/subtasks/${subTaskId}/subsubtasks`, { title: newSubSubTaskTitle })
+    const handleAddSubSubTask = () => {
+        axios.post(`/subtasks/${subTask.id}/subsubtasks`, { title: newSubSubTaskTitle })
             .then(response => {
-                onSubSubTaskDelete();  // Refresh the parent subtask list
+                setSubSubTasks([...subSubTasks, response.data]);
                 setNewSubSubTaskTitle('');
+                fetchSubSubTasks();
             })
             .catch(error => {
-                console.error("Error adding sub-subtask:", error);
+                console.error("Error adding subsubtask:", error);
             });
+    };
+
+    const handleSubSubTaskDelete = (subSubTask) => {
+        axios.delete(`subsubtasks/${subSubTask.id}`)
+        .then(() => {
+            fetchSubSubTasks();  // Fetch tasks after successful deletion
+        })
+        .catch(error => {
+            console.error(`Error deleting task:`, error);
+        });
+    };
+
+    const handleExpandClick = () => {
+        setIsExpanded(!isExpanded);
+        if (!isExpanded) {
+            fetchSubSubTasks();
+        }
     };
 
     return (
         <div>
-            {subTasks.map(subTask => (
-                <div key={subTask.id}>
-                    <h3>{subTask.title}</h3>
-                    <SubSubTask subTaskId={subTask.id} />
+            <h3>{subTask.title}</h3>
+            <button onClick={handleExpandClick}>
+                {isExpanded ? "Collapse" : "Expand"}
+            </button>
+            <button onClick={() => onDelete(subTask)}>Delete SubTask</button>
+            {isExpanded && (
+                <>
+                    {subSubTasks.map(subSubTask => (
+                        <SubSubTask 
+                            key={subSubTask.id} 
+                            subSubTask={subSubTask} 
+                            onDelete={() => handleSubSubTaskDelete(subSubTask)}
+                        />
+                    ))}
                     <input 
                         type="text" 
                         value={newSubSubTaskTitle} 
                         onChange={e => setNewSubSubTaskTitle(e.target.value)} 
                         placeholder="New SubSubTask Title"
                     />
-                    <button onClick={() => handleAddSubSubTask(subTask.id)}>Add SubSubTask</button>
-                </div>
-            ))}
+                    <button onClick={handleAddSubSubTask}>Add SubSubTask</button>
+                </>
+            )}
         </div>
     );
 }

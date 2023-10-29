@@ -1,24 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from '../AxiosConfig.js';
 import SubTask from './SubTask';
 
 function Task({ task, onDelete, onSubTaskDelete }) {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [subTasks, setSubTasks] = useState([]);
     const [newSubTaskTitle, setNewSubTaskTitle] = useState('');
 
-    const handleExpandClick = () => {
-        setIsExpanded(!isExpanded);
+    const fetchSubTasks = () => {
+        axios.get(`/tasks/${task.id}/subtasks`)
+            .then(response => {
+                setSubTasks(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching subtasks:", error);
+            });
     };
 
     const handleAddSubTask = () => {
         axios.post(`/tasks/${task.id}/subtasks`, { title: newSubTaskTitle })
-            .then(() => {
-                onSubTaskDelete();  // Refresh the parent task list
+            .then(response => {
+                setSubTasks([...subTasks, response.data]);
                 setNewSubTaskTitle('');
+                fetchSubTasks();
             })
             .catch(error => {
                 console.error("Error adding subtask:", error);
             });
+    };
+
+    const handleSubTaskDelete = (subTask) => {
+        axios.delete(`/subtasks/${subTask.id}`)
+        .then(() => {
+            fetchSubTasks();  // Fetch tasks after successful deletion
+        })
+        .catch(error => {
+            console.error(`Error deleting subtask:`, error);
+        });
+    };
+
+    const handleExpandClick = () => {
+        setIsExpanded(!isExpanded);
+        if (!isExpanded) {
+            fetchSubTasks();
+        }
     };
 
     return (
@@ -27,10 +52,16 @@ function Task({ task, onDelete, onSubTaskDelete }) {
             <button onClick={handleExpandClick}>
                 {isExpanded ? "Collapse" : "Expand"}
             </button>
-            <button onClick={onDelete}>Delete Task</button>
+            <button onClick={() => onDelete(task)}>Delete Task</button>
             {isExpanded && (
                 <>
-                    <SubTask taskId={task.id} onSubSubTaskDelete={onSubTaskDelete} />
+                    {subTasks.map(subTask => (
+                        <SubTask 
+                            key={subTask.id} 
+                            subTask={subTask} 
+                            onDelete={() => handleSubTaskDelete(subTask)}
+                        />
+                    ))}
                     <input 
                         type="text" 
                         value={newSubTaskTitle} 
